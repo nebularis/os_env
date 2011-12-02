@@ -20,6 +20,7 @@
 -include("os_env.hrl").
 -export_type([arch/0, library/0]).
 
+-export([environment_variables/0]).
 -export([inspect_os/0, home_dir/0, get/1, get/2]).
 -export([detect_os_arch/1, detect_long_bit/1]).
 -export([locate_escript/1, default_escript_exe/0]).
@@ -28,6 +29,9 @@
 -export([locate_library/2, detect_arch/1, load_path/1]).
 -export([code_dir/0, relative_path/1, trim_cmd/1,
          cached_filename/1, root_dir/0, username/0]).
+
+environment_variables() ->
+    [ pair(Var) || Var <- os:getenv() ].
 
 inspect_os() ->
     case os:type() of
@@ -201,3 +205,8 @@ root_dir() ->
 
 relative_path(SuffixList) ->
     filename:absname(filename:join(root_dir(), filename:join(SuffixList))).
+
+pair(Var) ->
+    [A, B] = string:tokens(Var, "="),
+    {list_to_atom(string:to_lower(A)), B}.
+

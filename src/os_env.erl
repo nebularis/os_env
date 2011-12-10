@@ -207,6 +207,6 @@ relative_path(SuffixList) ->
     filename:absname(filename:join(root_dir(), filename:join(SuffixList))).
 
 pair(Var) ->
-    [A, B] = string:tokens(Var, "="),
+    [A, B] = re:split(Var, "=", [{return,list},{parts,2}]),
     {list_to_atom(string:to_lower(A)), B}.
 

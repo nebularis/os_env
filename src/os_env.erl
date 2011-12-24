@@ -182,12 +182,12 @@ home_dir() ->
     HomeDir.
 
 get(Var) when is_atom(Var) ->
-    get(atom_to_list(Var));
+    ?MODULE:get(atom_to_list(Var));
 get(Var) when is_list(Var) ->
     os:getenv(string:to_upper(Var)).
 
 get(Var, Default) when is_atom(Var) ->
-    get(string:to_upper(atom_to_list(Var)), Default);
+    ?MODULE:get(string:to_upper(atom_to_list(Var)), Default);
 get(Var, Default) ->
     case os:getenv(Var) of
         false -> Default;
@@ -195,7 +195,8 @@ get(Var, Default) ->
     end.
 
 root_dir() ->
-    case get(standalone) of
+    %% TODO: use some other mechanism besides the process dictionary for this...
+    case erlang:get(standalone) of
         undefined ->
             filename:dirname(escript:script_name());
         _ ->

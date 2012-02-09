@@ -27,7 +27,7 @@
 -export([find_executable/1, find_executable/2]).
 -export([executable_name/1, library_path_env/1, path_sep/1]).
 -export([locate_library/2, detect_arch/1, load_path/1]).
--export([code_dir/0, relative_path/1, trim_cmd/1,
+-export([code_dir/0, relative_path/1, trim_cmd/1, temp_dir/0,
          cached_filename/1, root_dir/0, username/0]).
 
 environment_variables() ->
@@ -180,6 +180,16 @@ cached_filename(Name) ->
 home_dir() ->
     {ok, [[HomeDir]]} = init:get_argument(home),
     HomeDir.
+
+temp_dir() ->
+    case os:type() of
+        {win32, _} ->
+            %% mirrors the behaviour of the win32 GetTempPath function...
+            get("TMP", get("TEMP", element(2, file:get_cwd())));
+        _ ->
+            %% this is what the JVM does, but honestly... 
+            "/tmp"
+    end.
 
 get(Var) when is_atom(Var) ->
     ?MODULE:get(atom_to_list(Var));

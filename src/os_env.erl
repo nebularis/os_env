@@ -29,6 +29,7 @@
 -export([locate_library/2, detect_arch/1, load_path/1]).
 -export([code_dir/0, relative_path/1, trim_cmd/1, temp_dir/0,
          cached_filename/1, root_dir/0, username/0]).
+-export([ulimit/0]).
 
 environment_variables() ->
     [ pair(Var) || Var <- os:getenv() ].
@@ -189,6 +190,20 @@ temp_dir() ->
         _ ->
             %% this is what the JVM does, but honestly... 
             "/tmp"
+    end.
+
+ulimit() ->
+    %% NB: adapted from rabbitmq@rabbit_file_handle_cache
+    case proplists:get_value(max_fds, erlang:system_info(check_io)) of
+        MaxFds when is_integer(MaxFds) andalso MaxFds > 1 ->
+            case os:type() of
+                {win32, _OsName} ->
+                    MaxFds div 2;
+                _Any ->
+                    MaxFds
+            end;
+        _ ->
+            unknown
     end.
 
 get(Var) when is_atom(Var) ->
